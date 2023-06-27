@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": "^7.1",
-        "symfony/framework-bundle": "^3.4 || ^4.0",
+        "symfony/framework-bundle": "5.4.*",
         "symfony/debug": "^3.4 || ^4.0",
         "doctrine/common": "^2.3",
         "symfony/process": "^3.4 || ^4.0"

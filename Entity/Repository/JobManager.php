@@ -49,7 +49,7 @@ class JobManager
     {
         return $this->getJobManager()->createQuery("SELECT j FROM JMSJobQueueBundle:Job j WHERE j.command = :command AND j.args = :args")
             ->setParameter('command', $command)
-            ->setParameter('args', $args, Type::JSON_ARRAY)
+            ->setParameter('args', $args, 'json')
             ->setMaxResults(1)
             ->getOneOrNullResult();
     }
@@ -75,7 +75,7 @@ class JobManager
 
         $firstJob = $this->getJobManager()->createQuery("SELECT j FROM JMSJobQueueBundle:Job j WHERE j.command = :command AND j.args = :args ORDER BY j.id ASC")
              ->setParameter('command', $command)
-             ->setParameter('args', $args, 'json_array')
+             ->setParameter('args', $args, 'json')
              ->setMaxResults(1)
              ->getSingleResult();
 

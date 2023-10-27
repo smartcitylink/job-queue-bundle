@@ -2,10 +2,10 @@
 
 namespace JMS\JobQueueBundle\Entity\Type;
 
-use Doctrine\DBAL\Types\ObjectType;
+use Doctrine\DBAL\Types\JsonType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class SafeObjectType extends ObjectType
+class SafeObjectType extends JsonType
 {
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {

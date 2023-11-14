@@ -161,6 +161,9 @@ class Job
     /** @ORM\Column(type = "jms_job_safe_object", name="stackTrace", nullable = true) */
     private $stackTrace;
 
+    /** @ORM\Column(type = "text", name="stackTraceOld", nullable = true) */
+    private $stackTraceOld;
+
     /** @ORM\Column(type = "smallint", nullable = true, options = {"unsigned": true}) */
     private $runtime;
 

@@ -84,13 +84,16 @@ class Application extends BaseApplication
             return;
         }
 
+        $flattenException = $ex ? FlattenException::create($ex) : null;
+        $stackTrace = $flattenException ? $flattenException->getTrace() : null;
+
         $this->getConnection()->executeUpdate(
             "UPDATE jms_jobs SET stackTrace = :trace, memoryUsage = :memoryUsage, memoryUsageReal = :memoryUsageReal WHERE id = :id",
             array(
                 'id' => $jobId,
                 'memoryUsage' => memory_get_peak_usage(),
                 'memoryUsageReal' => memory_get_peak_usage(true),
-                'trace' => json_encode($ex ? FlattenException::create($ex) : null),
+                'trace' => json_encode($stackTrace),
             ),
             array(
                 'id' => \PDO::PARAM_INT,

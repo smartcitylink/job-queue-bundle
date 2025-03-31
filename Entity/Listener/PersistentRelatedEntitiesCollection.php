@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\ClosureExpressionVisitor;
 use Doctrine\Common\Collections\Selectable;
 use JMS\JobQueueBundle\Entity\Job;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+
 
 /**
  * Collection for persistent related entities.
@@ -554,5 +554,15 @@ class PersistentRelatedEntitiesCollection implements Collection, Selectable
         }
 
         $this->entities = $entities;
+    }
+
+    public function findFirst(Closure $p)
+    {
+        // TODO: Implement findFirst() method.
+    }
+
+    public function reduce(Closure $func, mixed $initial = null)
+    {
+        // TODO: Implement reduce() method.
     }
 }

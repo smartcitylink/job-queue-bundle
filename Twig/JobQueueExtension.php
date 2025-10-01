@@ -11,21 +11,21 @@ class JobQueueExtension extends \Twig_Extension
         $this->linkGenerators = $generators;
     }
 
-    public function getTests()
+    public function getTests(): array
     {
         return array(
             new \Twig_SimpleTest('jms_job_queue_linkable', array($this, 'isLinkable'))
         );
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return array(
             new \Twig_SimpleFunction('jms_job_queue_path', array($this, 'generatePath'), array('is_safe' => array('html' => true)))
         );
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return array(
             new \Twig_SimpleFilter('jms_job_queue_linkname', array($this, 'getLinkname')),
@@ -33,7 +33,7 @@ class JobQueueExtension extends \Twig_Extension
         );
     }
 
-    public function formatArgs(array $args, $maxLength = 60)
+    public function formatArgs(array $args, $maxLength = 60): string
     {
         $str = '';
         $first = true;
@@ -56,7 +56,7 @@ class JobQueueExtension extends \Twig_Extension
         return $str;
     }
 
-    public function isLinkable($entity)
+    public function isLinkable($entity): bool
     {
         foreach ($this->linkGenerators as $generator) {
             if ($generator->supports($entity)) {
@@ -89,7 +89,7 @@ class JobQueueExtension extends \Twig_Extension
         throw new \RuntimeException(sprintf('The entity "%s" has no link generator.', get_class($entity)));
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'jms_job_queue';
     }

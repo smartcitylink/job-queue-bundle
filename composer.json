@@ -19,6 +19,7 @@
   ],
   "require": {
     "php": "^7.4 || ^8.0",
+    "ext-pdo": "*",
     "symfony/framework-bundle": "^5.4 || ^6.4",
     "symfony/console": "^5.4 || ^6.4",
     "doctrine/common": "^2.3 || ^3.0",

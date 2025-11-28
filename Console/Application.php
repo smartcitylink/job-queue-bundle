@@ -87,7 +87,7 @@ class Application extends BaseApplication
         $flattenException = $ex ? FlattenException::create($ex) : null;
         $stackTrace = $flattenException ? $flattenException->getTrace() : null;
 
-        $this->getConnection()->executeUpdate(
+        $this->getConnection()->executeStatement(
             "UPDATE jms_jobs SET stackTrace = :trace, memoryUsage = :memoryUsage, memoryUsageReal = :memoryUsageReal WHERE id = :id",
             array(
                 'id' => $jobId,

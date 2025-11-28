@@ -1,8 +1,9 @@
 <?php
 
 namespace JMS\JobQueueBundle\Entity\Listener;
+
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use JMS\JobQueueBundle\Entity\Job;
 
 /**
@@ -23,14 +24,14 @@ class ManyToAnyListener
     public function __construct(Registry $registry)
     {
         $this->registry = $registry;
-        $this->ref = new \ReflectionProperty('JMS\JobQueueBundle\Entity\Job', 'relatedEntities');
+        $this->ref = new \ReflectionProperty(Job::class, 'relatedEntities');
         $this->ref->setAccessible(true);
     }
 
-    public function postLoad(\Doctrine\ORM\Event\LifecycleEventArgs $event)
+    public function postLoad(LifecycleEventArgs $event)
     {
-        $entity = $event->getEntity();
-        if ( ! $entity instanceof \JMS\JobQueueBundle\Entity\Job) {
+        $entity = $event->getObject();
+        if (!$entity instanceof Job) {
             return;
         }
 
@@ -39,39 +40,39 @@ class ManyToAnyListener
 
     public function preRemove(LifecycleEventArgs $event)
     {
-        $entity = $event->getEntity();
-        if ( ! $entity instanceof Job) {
+        $entity = $event->getObject();
+        if (!$entity instanceof Job) {
             return;
         }
 
-        $con = $event->getEntityManager()->getConnection();
-        $con->executeUpdate("DELETE FROM jms_job_related_entities WHERE job_id = :id", array(
+        $con = $event->getObjectManager()->getConnection();
+        $con->executeStatement("DELETE FROM jms_job_related_entities WHERE job_id = :id", [
             'id' => $entity->getId(),
-        ));
+        ]);
     }
 
-    public function postPersist(\Doctrine\ORM\Event\LifecycleEventArgs $event)
+    public function postPersist(LifecycleEventArgs $event)
     {
-        $entity = $event->getEntity();
-        if ( ! $entity instanceof \JMS\JobQueueBundle\Entity\Job) {
+        $entity = $event->getObject();
+        if (!$entity instanceof Job) {
             return;
         }
 
-        $con = $event->getEntityManager()->getConnection();
+        $con = $event->getObjectManager()->getConnection();
         foreach ($this->ref->getValue($entity) as $relatedEntity) {
             $relClass = \Doctrine\Common\Util\ClassUtils::getClass($relatedEntity);
             $relId = $this->registry->getManagerForClass($relClass)->getMetadataFactory()->getMetadataFor($relClass)->getIdentifierValues($relatedEntity);
             asort($relId);
 
-            if ( ! $relId) {
+            if (!$relId) {
                 throw new \RuntimeException('The identifier for the related entity "'.$relClass.'" was empty.');
             }
 
-            $con->executeUpdate("INSERT INTO jms_job_related_entities (job_id, related_class, related_id) VALUES (:jobId, :relClass, :relId)", array(
+            $con->executeStatement("INSERT INTO jms_job_related_entities (job_id, related_class, related_id) VALUES (:jobId, :relClass, :relId)", [
                 'jobId' => $entity->getId(),
                 'relClass' => $relClass,
                 'relId' => json_encode($relId),
-            ));
+            ]);
         }
     }
 
@@ -80,15 +81,15 @@ class ManyToAnyListener
         $schema = $event->getSchema();
 
         // When using multiple entity managers ignore events that are triggered by other entity managers.
-        if ($event->getEntityManager()->getMetadataFactory()->isTransient('JMS\JobQueueBundle\Entity\Job')) {
+        if ($event->getEntityManager()->getMetadataFactory()->isTransient(Job::class)) {
             return;
         }
 
         $table = $schema->createTable('jms_job_related_entities');
-        $table->addColumn('job_id', 'bigint', array('notnull' => true, 'unsigned' => true));
-        $table->addColumn('related_class', 'string', array('notnull' => true, 'length' => '150'));
-        $table->addColumn('related_id', 'string', array('notnull' => true, 'length' => '100'));
-        $table->setPrimaryKey(array('job_id', 'related_class', 'related_id'));
-        $table->addForeignKeyConstraint('jms_jobs', array('job_id'), array('id'));
+        $table->addColumn('job_id', 'bigint', ['notnull' => true, 'unsigned' => true]);
+        $table->addColumn('related_class', 'string', ['notnull' => true, 'length' => '150']);
+        $table->addColumn('related_id', 'string', ['notnull' => true, 'length' => '100']);
+        $table->setPrimaryKey(['job_id', 'related_class', 'related_id']);
+        $table->addForeignKeyConstraint('jms_jobs', ['job_id'], ['id']);
     }
 }

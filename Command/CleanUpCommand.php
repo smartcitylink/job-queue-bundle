@@ -97,8 +97,8 @@ class CleanUpCommand extends Command
             $count++;
 
             $result = $con->executeQuery($incomingDepsSql, array('id' => $job->getId()));
-            if ($result->fetchColumn() !== false) {
-                $em->transactional(function() use ($em, $job) {
+            if ($result->fetchOne() !== false) {
+                $em->getConnection()->transactional(function() use ($em, $job) {
                     $this->resolveDependencies($em, $job);
                     $em->remove($job);
                 });
